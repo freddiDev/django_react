@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  api:
+    container_name: api_django_react
+    build:
+        context: .
+        dockerfile: ./docker/django/Dockerfile
+    command: /start
+    volumes:
+        - .:/app
+        - static_volume:/app/staticfiles
+        - media_volume:/app/mediafiles
+    expose:
+        - "8000"
+    env_file:
+        - .env
+    depends_on:
+        - postgres-db
+    networks:
+        - estate-react
+    
+  postgres-db:
+    container_name: postgresql_django_react
+    image: postgres:12.0-alpine
+    volumes:
+        - postgres_data:/var/lib/postgresql/data/
+    environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+        - estate-react
+
+
+networks:
+    estate-react:
+        driver: bridge
+
+volumes:
+    postgres_data:
+    static_volume:
+    media_volume:
